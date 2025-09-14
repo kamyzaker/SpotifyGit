@@ -49,7 +49,7 @@ async def correct_track_search(
         if e.http_status == 401:
             new_token = await refresh_access_token(state)
             if new_token:
-                await correct_track_search(message, text, state=state, dm=dialog_manager)
+                await correct_track_search(message, text, dialog_manager=dialog_manager)
             else:
                 await message.answer(f'Токен истёк. Авторизуйся заново.')
         else:
@@ -98,7 +98,7 @@ async def correct_album_search(message: Message,
         if e.http_status == 401:
             new_token = await refresh_access_token(state)
             if new_token:
-                await correct_album_search(message, text, state=state, dm=dialog_manager)
+                await correct_album_search(message, text, dialog_manager=dialog_manager)
             else:
                 await message.answer(f'Токен истёк. Авторизуйся заново.')
         else:
@@ -190,7 +190,7 @@ async def correct_artist_search(
         if e.http_status == 401:
             new_token = await refresh_access_token(state)
             if new_token:
-                await correct_artist_search(message, text, dm=dialog_manager)
+                await correct_artist_search(message, text, dialog_manager=dialog_manager)
             else:
                 await message.answer(f'Токен истёк. Авторизуйся заново.')
         else:

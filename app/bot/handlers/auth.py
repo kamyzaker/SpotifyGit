@@ -37,6 +37,7 @@ async def process_start_command(
     translations: dict,
     dialog_manager: DialogManager
 ):
+    logger.info(f"Current intent ID: {dialog_manager.intent_id if hasattr(dialog_manager, 'intent_id') else 'No intent'}")
     user_row = await get_user(conn, user_id=message.from_user.id)
     if user_row is None:
         if message.from_user.id in admin_ids:
@@ -87,8 +88,10 @@ async def process_start_command(
         await message.answer(i18n.get("auth_spotify"), reply_markup=kb)
         await state.set_state(SpotifyAuthSG.waiting_for_code)
     else:
-        logger.info(f"Stack size: {len(dialog_manager.s)}")
+        logger.info(f"dialog_manager current_stack:{dialog_manager.current_stack()}")
         await dialog_manager.start(state=MainMenuSG.menu, mode=StartMode.RESET_STACK)
+
+
         
     
 
@@ -112,17 +115,18 @@ async def process_code(message: Message, conn: AsyncConnection, state: FSMContex
         await state.set_state()
 
 
-        await dialog_manager.start(state=MainMenuSG.menu, data={'access_token': access_token})
+        await dialog_manager.start(state=MainMenuSG.menu, mode=StartMode.RESET_STACK, data={'access_token': access_token})
         dialog_manager.dialog_data['access_token'] = access_token   
     except Exception as e:
-        await message.answer(f'Ошибка: {str(e)}. Попробуй заново.')
+        logger.info(f'Ошибка: {str(e)}. Попробуй заново.')
+        await state.set_state()
 
 
 
 @router_start.message(Command(commands="help"))
 async def process_help_command(message: Message, i18n: dict[str, str], state: FSMContext, dialog_manager: DialogManager):
-    await dialog_manager.start(state=MainMenuSG.menu)
     await message.answer(text=i18n.get("/help"))
+    await dialog_manager.start(state=MainMenuSG.menu)
 
 
 # Этот хэндлер будет срабатывать на блокировку бота пользователем

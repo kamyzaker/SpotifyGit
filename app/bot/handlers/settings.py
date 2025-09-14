@@ -67,6 +67,7 @@ async def process_lang_command(
     )
 
     await state.update_data(lang_settings_msg_id=msg.message_id, user_lang=user_lang)
+    await state.set_state()
 
 
 # Этот хэндлер будет срабатывать на нажатие кнопки "Сохранить" в режиме настроек языка
